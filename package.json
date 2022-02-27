@@ -1,0 +1,19 @@
+{
+  "name": "liveuamap-news",
+  "version": "1.0.0",
+  "description": "Gets news from https://liveuamap.com/.",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "Mohammed Keyvanzadeh <mohammadkeyvanzade94@gmail.com>",
+  "license": "ISC",
+  "dependencies": {
+    "chalk": "^5.0.0",
+    "cheerio": "^1.0.0-rc.10",
+    "discord.js": "^13.6.0",
+    "node-fetch": "^3.2.0"
+  }
+}
