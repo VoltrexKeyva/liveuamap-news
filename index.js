@@ -1,5 +1,5 @@
 import { WebhookClient, MessageEmbed, Formatters } from 'discord.js';
-import fetch from 'node-fetch';
+import { request } from 'undici';
 import cheerio from 'cheerio';
 import chalk from 'chalk';
 import { readFileSync, writeFileSync } from 'node:fs';
@@ -147,9 +147,8 @@ while (true) {
     );
     prettyLog('+', 'Fetching all articles and parsing HTML...');
 
-    const $ = await fetch('https://liveuamap.com/')
-      .then((res) => res.text())
-      .then((html) => cheerio.load(html));
+    const liveuamapResponse = await request('https://liveuamap.com/');
+    const $ = cheerio.load(liveuamapResponse.body);
 
     let latestNews = $('div[id="feedler"]');
 
@@ -162,7 +161,6 @@ while (true) {
       );
 
       await setPromisedTimeout(5000);
-
       continue;
     }
 
@@ -173,9 +171,8 @@ while (true) {
     if (news.id !== (readConfig('lastId') ?? null)) {
       prettyLog('+', 'New article found, checking article...');
 
-      const $_ = await fetch(news.extra)
-        .then((res) => res.text())
-        .then((html) => cheerio.load(html));
+      const extraResponse = await request(news.extra);
+      const $_ = cheerio.load(extraResponse.body);
 
       await sendToWebhook(new Article(news, $_));
 
