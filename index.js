@@ -6,7 +6,7 @@ import { readFileSync, writeFileSync } from 'node:fs';
 import { setTimeout as setPromisedTimeout } from 'timers/promises';
 import { randomInt } from 'node:crypto';
 
-const configData = JSON.parse(readFileSync('./config.json', 'utf-8'));
+let configData = JSON.parse(readFileSync('./config.json', 'utf-8'));
 const { hyperlink, quote, time } = Formatters;
 
 class Feed {
