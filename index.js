@@ -6,6 +6,7 @@ import { readFileSync, writeFileSync } from 'node:fs';
 import { setTimeout as setPromisedTimeout } from 'timers/promises';
 import { randomInt } from 'node:crypto';
 
+const configData = JSON.parse(readFileSync('./config.json', 'utf-8'));
 const { hyperlink, quote, time } = Formatters;
 
 class Feed {
@@ -62,9 +63,7 @@ class Article {
  * @returns {any}
  */
 function readConfig(key) {
-  const data = JSON.parse(readFileSync('./config.json', 'utf-8'));
-
-  return key != undefined ? data[key] : data;
+  return key != undefined ? configData[key] : configData;
 }
 
 /**
@@ -73,7 +72,8 @@ function readConfig(key) {
  * @returns {void}
  */
 function writeConfig(data) {
-  writeFileSync('./config.json', JSON.stringify(Object.assign(readConfig(), data)));
+  configData = Object.assign(configData, data);
+  writeFileSync('./config.json', JSON.stringify(configData));
 }
 
 const webhookClient = new WebhookClient({ url: readConfig('url') ?? null });
