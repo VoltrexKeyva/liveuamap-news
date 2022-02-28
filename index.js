@@ -1,11 +1,12 @@
 import { WebhookClient, MessageEmbed, Formatters } from 'discord.js';
-import fetch from 'node-fetch';
+import { request } from 'undici';
 import cheerio from 'cheerio';
 import chalk from 'chalk';
 import { readFileSync, writeFileSync } from 'node:fs';
 import { setTimeout as setPromisedTimeout } from 'timers/promises';
 import { randomInt } from 'node:crypto';
 
+let configData = JSON.parse(readFileSync('./config.json', 'utf-8'));
 const { hyperlink, quote, time } = Formatters;
 
 class Feed {
@@ -23,7 +24,7 @@ class Feed {
     {
       const mainVideo = htmlData.attr('data-twitpic');
 
-      if (mainVideo !== undefined && mainVideo.includes('video'))
+      if (mainVideo?.includes('video'))
         this.video = mainVideo;
       else {
         const twitterVideo = htmlData
@@ -62,9 +63,7 @@ class Article {
  * @returns {any}
  */
 function readConfig(key) {
-  const data = JSON.parse(readFileSync('./config.json', 'utf-8'));
-
-  return key != undefined ? data[key] : data;
+  return key != undefined ? configData[key] : configData;
 }
 
 /**
@@ -73,11 +72,8 @@ function readConfig(key) {
  * @returns {void}
  */
 function writeConfig(data) {
-  const config = readConfig();
-
-  for (const [key, value] of Object.entries(data)) config[key] = value;
-
-  writeFileSync('./config.json', JSON.stringify(config));
+  configData = Object.assign(configData, data);
+  writeFileSync('./config.json', JSON.stringify(configData));
 }
 
 const webhookClient = new WebhookClient({ url: readConfig('url') ?? null });
@@ -151,9 +147,8 @@ while (true) {
     );
     prettyLog('+', 'Fetching all articles and parsing HTML...');
 
-    const $ = await fetch('https://liveuamap.com/')
-      .then((res) => res.text())
-      .then((html) => cheerio.load(html));
+    const liveuamapResponse = await request('https://liveuamap.com/');
+    const $ = cheerio.load(await liveuamapResponse.body.text());
 
     let latestNews = $('div[id="feedler"]');
 
@@ -166,7 +161,6 @@ while (true) {
       );
 
       await setPromisedTimeout(5000);
-
       continue;
     }
 
@@ -177,9 +171,8 @@ while (true) {
     if (news.id !== (readConfig('lastId') ?? null)) {
       prettyLog('+', 'New article found, checking article...');
 
-      const $_ = await fetch(news.extra)
-        .then((res) => res.text())
-        .then((html) => cheerio.load(html));
+      const extraResponse = await request(news.extra);
+      const $_ = cheerio.load(await extraResponse.body.text());
 
       await sendToWebhook(new Article(news, $_));
 
