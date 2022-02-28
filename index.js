@@ -23,7 +23,7 @@ class Feed {
     {
       const mainVideo = htmlData.attr('data-twitpic');
 
-      if (mainVideo !== undefined && mainVideo.includes('video'))
+      if (mainVideo?.includes('video'))
         this.video = mainVideo;
       else {
         const twitterVideo = htmlData
@@ -73,11 +73,7 @@ function readConfig(key) {
  * @returns {void}
  */
 function writeConfig(data) {
-  const config = readConfig();
-
-  for (const [key, value] of Object.entries(data)) config[key] = value;
-
-  writeFileSync('./config.json', JSON.stringify(config));
+  writeFileSync('./config.json', JSON.stringify(Object.assign(readConfig(), data)));
 }
 
 const webhookClient = new WebhookClient({ url: readConfig('url') ?? null });
