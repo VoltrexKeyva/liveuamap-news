@@ -148,7 +148,7 @@ while (true) {
     prettyLog('+', 'Fetching all articles and parsing HTML...');
 
     const liveuamapResponse = await request('https://liveuamap.com/');
-    const $ = cheerio.load(liveuamapResponse.body);
+    const $ = cheerio.load(await liveuamapResponse.body.text());
 
     let latestNews = $('div[id="feedler"]');
 
@@ -172,7 +172,7 @@ while (true) {
       prettyLog('+', 'New article found, checking article...');
 
       const extraResponse = await request(news.extra);
-      const $_ = cheerio.load(extraResponse.body);
+      const $_ = cheerio.load(await extraResponse.body.text());
 
       await sendToWebhook(new Article(news, $_));
 
