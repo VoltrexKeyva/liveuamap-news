@@ -6,7 +6,6 @@ import { readFileSync, writeFileSync } from 'node:fs';
 import { setTimeout as setPromisedTimeout } from 'timers/promises';
 import { randomInt } from 'node:crypto';
 
-let configData = JSON.parse(readFileSync('./config.json', 'utf-8'));
 const { hyperlink, quote, time } = Formatters;
 
 class Feed {
@@ -63,7 +62,9 @@ class Article {
  * @returns {any}
  */
 function readConfig(key) {
-  return key != undefined ? configData[key] : configData;
+  const config = JSON.parse(readFileSync('./config.json', 'utf-8'));
+
+  return key != undefined ? config[key] : config;
 }
 
 /**
@@ -72,8 +73,9 @@ function readConfig(key) {
  * @returns {void}
  */
 function writeConfig(data) {
-  configData = Object.assign(configData, data);
-  writeFileSync('./config.json', JSON.stringify(configData));
+  const config = Object.assign(readConfig(), data);
+
+  writeFileSync('./config.json', JSON.stringify(config, null, 2));
 }
 
 const webhookClient = new WebhookClient({ url: readConfig('url') ?? null });
@@ -160,7 +162,7 @@ while (true) {
         'Failed to get feedler, probably a 5XX error, trying again...'
       );
 
-      await setPromisedTimeout(5000);
+      await setPromisedTimeout(5_000);
       continue;
     }
 
