@@ -3,7 +3,7 @@ import { request } from 'undici';
 import cheerio from 'cheerio';
 import chalk from 'chalk';
 import { readFileSync, writeFileSync } from 'node:fs';
-import { setTimeout as setPromisedTimeout } from 'timers/promises';
+import { setTimeout as setPromisedTimeout } from 'node:timers/promises';
 import { randomInt } from 'node:crypto';
 
 const { hyperlink, quote, time } = Formatters;
@@ -23,8 +23,7 @@ class Feed {
     {
       const mainVideo = htmlData.attr('data-twitpic');
 
-      if (mainVideo?.includes('video'))
-        this.video = mainVideo;
+      if (mainVideo?.includes('video')) this.video = mainVideo;
       else {
         const twitterVideo = htmlData
           .find('blockquote[class="twitter-video"]')
