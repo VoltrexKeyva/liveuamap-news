@@ -67,7 +67,7 @@ function readConfig(key) {
 }
 
 /**
- * Writes the config.json with the specified keys and values.
+ * Writes the config.json file with the specified keys and values.
  * @param {Record<string, any>} data
  * @returns {void}
  */
@@ -77,7 +77,14 @@ function writeConfig(data) {
   writeFileSync('./config.json', JSON.stringify(config, null, 2));
 }
 
-const webhookClient = new WebhookClient({ url: readConfig('url') ?? null });
+const url = readConfig('url');
+
+if (typeof url !== 'string')
+  throw new Error(
+    "No Discord webhook URL was provided in the 'config.json' file's 'url' field."
+  );
+
+const webhookClient = new WebhookClient({ url });
 
 /**
  * Send a message to the webhook.
@@ -148,8 +155,9 @@ while (true) {
     );
     prettyLog('+', 'Fetching all articles and parsing HTML...');
 
-    const liveuamapResponse = await request('https://liveuamap.com/');
-    const $ = cheerio.load(await liveuamapResponse.body.text());
+    const $ = await request('https://liveuamap.com/')
+      .then((res) => res.body.text())
+      .then((html) => cheerio.load(html));
 
     let latestNews = $('div[id="feedler"]');
 
@@ -172,8 +180,9 @@ while (true) {
     if (news.id !== (readConfig('lastId') ?? null)) {
       prettyLog('+', 'New article found, checking article...');
 
-      const extraResponse = await request(news.extra);
-      const $_ = cheerio.load(await extraResponse.body.text());
+      const $_ = await request(news.extra)
+        .then((res) => res.body.text())
+        .then((html) => cheerio.load(html));
 
       await sendToWebhook(new Article(news, $_));
 
