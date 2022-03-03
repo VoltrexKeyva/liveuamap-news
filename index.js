@@ -176,8 +176,14 @@ while (true) {
     latestNews = latestNews.children().first();
 
     const news = new Feed(latestNews);
+    const config = readConfig();
 
-    if (news.id !== (readConfig('lastId') ?? null)) {
+    if (
+      news.id !== (config.lastId ?? null) &&
+      (Array.isArray(config.knownTitles)
+        ? !config.knownTitles.includes(news.info)
+        : true)
+    ) {
       prettyLog('+', 'New article found, checking article...');
 
       const $_ = await request(news.extra)
@@ -186,7 +192,13 @@ while (true) {
 
       await sendToWebhook(new Article(news, $_));
 
-      writeConfig({ lastId: news.id });
+      const knownTitles = config.knownTitles ?? [];
+
+      if (knownTitles.length === 30) knownTitles.shift();
+
+      knownTitles.push(news.info);
+
+      writeConfig({ lastId: news.id, knownTitles });
 
       prettyLog('!', news.info);
     } else prettyLog('-', `No news found, waiting ${randomTimeout} seconds...`);
