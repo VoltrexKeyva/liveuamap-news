@@ -1,6 +1,6 @@
 import { WebhookClient, MessageEmbed, Formatters } from 'discord.js';
 import { request } from 'undici';
-import cheerio from 'cheerio';
+import { load } from 'cheerio';
 import chalk from 'chalk';
 import { readFileSync, writeFileSync } from 'node:fs';
 import { setTimeout as setPromisedTimeout } from 'node:timers/promises';
@@ -157,7 +157,7 @@ while (true) {
 
     const $ = await request('https://liveuamap.com/')
       .then((res) => res.body.text())
-      .then((html) => cheerio.load(html));
+      .then((html) => load(html));
 
     let latestNews = $('div[id="feedler"]');
 
@@ -188,7 +188,7 @@ while (true) {
 
       const $_ = await request(news.extra)
         .then((res) => res.body.text())
-        .then((html) => cheerio.load(html));
+        .then((html) => load(html));
 
       await sendToWebhook(new Article(news, $_));
 
