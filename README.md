@@ -1,4 +1,4 @@
-# Liveuamap News
+# LiveUAMap News
 
 Gets news from https://liveuamap.com/ and sends it to a Discord webhook.
 
