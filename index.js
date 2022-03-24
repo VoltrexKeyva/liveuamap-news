@@ -144,6 +144,7 @@ function prettyLog(symbol, value) {
   console.log(symbols[symbol](`[${symbol}]`), value);
 }
 
+// eslint-disable-next-line no-constant-condition
 while (true) {
   // Random wait time to not be too obvious, since we're scarping the website.
   const randomTimeout = randomInt(45, 75);
