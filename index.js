@@ -1,4 +1,4 @@
-import { WebhookClient, MessageEmbed, Formatters } from 'discord.js';
+import { WebhookClient, EmbedBuilder, Formatters } from 'discord.js';
 import { request } from 'undici';
 import { load } from 'cheerio';
 import chalk from 'chalk';
@@ -94,7 +94,7 @@ const webhookClient = new WebhookClient({ url });
 async function sendToWebhook(htmlContent) {
   const time_ = new Date();
 
-  const embed = new MessageEmbed()
+  const embed = new EmbedBuilder()
     .setColor(0xf1c40f)
     .setThumbnail('https://cdn.discordapp.com/emojis/691373958087442486.png')
     .setAuthor({
@@ -108,14 +108,16 @@ async function sendToWebhook(htmlContent) {
           : 'ℹ️ Unable to find source...'
       }\n${htmlContent.info}`
     )
-    .addField(
-      'Timezones',
-      `🇺🇸 ${time_.toLocaleString('en-US', {
-        timeZone: 'America/New_york'
-      })}\n🇺🇦 ${new Date(
-        time_.getTime() + 7_200_000
-      ).toLocaleString()}\n🌍 ${time(time_, 'd')} ${time(time_, 't')}`
-    );
+    .addFields([
+      {
+        name: 'Timezones',
+        value: `🇺🇸 ${time_.toLocaleString('en-US', {
+          timeZone: 'America/New_york'
+        })}\n🇺🇦 ${new Date(
+          time_.getTime() + 7_200_000
+        ).toLocaleString()}\n🌍 ${time(time_, 'd')} ${time(time_, 't')}`
+      }
+    ]);
 
   if (htmlContent.image !== null && (readConfig('embedImage') ?? true))
     embed.setImage(htmlContent.image);
