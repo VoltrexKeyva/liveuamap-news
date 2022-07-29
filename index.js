@@ -1,12 +1,16 @@
-import { WebhookClient, EmbedBuilder, Formatters } from 'discord.js';
+import {
+  WebhookClient,
+  EmbedBuilder,
+  hyperlink,
+  quote,
+  time
+} from 'discord.js';
 import { request } from 'undici';
 import { load } from 'cheerio';
 import chalk from 'chalk';
 import { readFileSync, writeFileSync } from 'node:fs';
 import { setTimeout as setPromisedTimeout } from 'node:timers/promises';
 import { randomInt } from 'node:crypto';
-
-const { hyperlink, quote, time } = Formatters;
 
 class Feed {
   /**

@@ -13,7 +13,7 @@
   "dependencies": {
     "chalk": "^5.0.1",
     "cheerio": "^1.0.0-rc.12",
-    "discord.js": "^14.0.3",
+    "discord.js": "^14.1.1",
     "undici": "^5.8.0"
   }
 }
